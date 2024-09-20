@@ -13,7 +13,8 @@ const ProfileInfo =(props)=> {
         </div>
         <div className={s.AvaDescription}> 
           <img src={props.profile.photos.large} />
-        Ava + description</div>
+        Ava + description
+        <p> fullname: {props.profile.fullName}</p></div>
        </div>
 		)
 

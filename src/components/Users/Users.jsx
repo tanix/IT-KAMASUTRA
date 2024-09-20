@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './users.module.css';
 import { NavLink } from 'react-router-dom';
-import Axios from 'axios';
+import {unFollowThunkCreator, followThunkCreator} from  '../../redux/users-reducer';
 
 let Users = (props) => {
   let pagesCount = Math.ceil(props.totalUsersCount / props.pageSize);
@@ -27,36 +27,15 @@ let Users = (props) => {
               </NavLink>
             </div>
             <div>
-             
-              { u.followed
-        ? <button disabled={props.followingInProgress.some(id=> id===u.id) } onClick={() => { 
-                  props.toggleIsFollowing(true, u.id);
-                  Axios.delete(`https://social-network.samuraijs.com/api/1.0/follow/${u.id}`, {
-                    withCredentials: true,
-                    headers: {
-                      "API_KEY": "646cf753-167a-4b00-bb7a-a192ae1158cd"
-                    }
-                  })
-                  .then(response => {
-                   if(response.data.resultCode==0) {
-                    props.unfollow(u.id);
-                     props.toggleIsFollowing(false, u.id);
-                   }
-                  });
-                   }}>unFollow </button>
-                : <button  disabled={props.followingInProgress.some(id=> id===u.id)} onClick={() => {
-                  props.toggleIsFollowing(true, u.id);
-                  Axios.post(`https://social-network.samuraijs.com/api/1.0/follow/${u.id}`,{}, {
-                    withCredentials: true,
-                    headers: {
-                      "API-KEY": "646cf753-167a-4b00-bb7a-a192ae1158cd"
-                    }})
-                    .then(response => {
-                     if(response.data.resultCode==0) {
-                      props.follow(u.id);
-                      props.toggleIsFollowing(false, u.id);
-                     }
-                    });
+
+              {u.followed
+                ? <button disabled={props.followingInProgress.some(id => id === u.id)} onClick={() => {
+                  // Thunk must be updated. Dispatch is not called
+                  unFollowThunkCreator(u.id)(window.store.dispatch);
+                }}>unFollow </button>
+                : <button disabled={props.followingInProgress.some(id => id === u.id)} onClick={() => {
+                  // Thunk must be updated. Dispatch is not called
+                  followThunkCreator(u.id)(window.store.dispatch);
 
                 }}>Follow </button>
               }

@@ -1,50 +1,45 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {follow, unfollow, setUsers, setCurrentPage, setTotalUserCount,toggleIsFetching, toggleIsFollowing } from '../../redux/users-reducer'
-import Axios from 'axios';
+import { connect } from 'react-redux';
+import { follow, unfollow, setCurrentPage, toggleIsFollowing, getUsersThunkCreator } from '../../redux/users-reducer'
+
 import Preloader from '../Common/Preloader/Preloader'
 import Users from './Users'
-import { UserAPI } from '../../api/api';
+
 
 class UsersAPIComponent extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  componentDidMount() {
-  	this.props.toggleIsFetching(true);
-	  UserAPI.getUsersData().then(data => {
-     	this.props.toggleIsFetching(false);
-        this.props.setUsers(data.items);
-        this.props.setTotalUserCount(data.totalCount);
-      });
+	constructor(props) {
+		super(props);
+	}
+	componentDidMount() {
+		let pageNumber = 1;
+		// Thunk must be updated. Dispatch is not called
+		getUsersThunkCreator(pageNumber, this.props.pageSize)(window.store.dispatch);
+	}
+	
+	onChanged = (pageNumber) => {
 
-  }
-onChanged = (pageNumber) => {
-	this.props.toggleIsFetching(true);
-    this.props.setCurrentPage(pageNumber);
-    UserAPI.getChangedUserData(pageNumber, this.props.pageSize).then(data => {
-        this.props.toggleIsFetching(false);
-        this.props.setUsers(data.items)
-      });
-  }
-  render() {
-      
-    return (
-    	<>
-    	{ this.props.isFetching ? <Preloader />: ""}
-	        <Users totalUsersCount={this.props.totalUsersCount}
-	        pageSize={this.props.pageSize}
-	        currentPage ={ this.props.currentPage}
-	        onChanged={this.onChanged}
-	        users={this.props.users}
-	        unfollow={this.props.unfollow}
-	        follow={this.props.follow}
-		    followingInProgress={this.props.followingInProgress}
-	        toggleIsFollowing={this.props.toggleIsFollowing}
-	        />
-        </>
-    )
-  }
+		this.props.setCurrentPage(pageNumber);
+		// Thunk must be updated. Dispatch is not called
+		getUsersThunkCreator(pageNumber, this.props.pageSize)(window.store.dispatch);
+	}
+	render() {
+
+		return (
+			<>
+				{this.props.isFetching ? <Preloader /> : ""}
+				<Users totalUsersCount={this.props.totalUsersCount}
+					pageSize={this.props.pageSize}
+					currentPage={this.props.currentPage}
+					onChanged={this.onChanged}
+					users={this.props.users}
+					unfollow={this.props.unfollow}
+					follow={this.props.follow}
+					followingInProgress={this.props.followingInProgress}
+					toggleIsFollowing={this.props.toggleIsFollowing}
+				/>
+			</>
+		)
+	}
 }
 let mapStateToProps = (state) => {
 	return {
@@ -57,15 +52,10 @@ let mapStateToProps = (state) => {
 	}
 }
 
-let mapDispatchToProps = (dispatch) => {
-	return 
-}
 export default connect(mapStateToProps, {
-		follow,
-		unfollow,
-		setUsers,
-		setCurrentPage,
-		setTotalUserCount,
-		toggleIsFetching,
-		toggleIsFollowing
-	})(UsersAPIComponent);
+	follow,
+	unfollow,
+	setCurrentPage,
+	toggleIsFollowing,
+	getUsersThunkCreator
+})(UsersAPIComponent);

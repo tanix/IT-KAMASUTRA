@@ -1,3 +1,5 @@
+import { UserAPI } from '../api/api';
+
 const ADDPOST = 'ADD-POST';
 const UPDATETEXTARIA= 'UPDATE-TEXT-ARIA';
 const SETUSERPROFILE = 'SET-USER-PROFILE';
@@ -52,4 +54,12 @@ export const UpdateTextAriaActionCreater = (value) => {
 }
 export const setUserProfile = (profile) => {
 	return {type:SETUSERPROFILE, profile }
+}
+export const getProfileThunkCreator = (userId) => {
+	return (dispatch) => {
+		UserAPI.getProfile(userId)
+			.then(response => {
+				dispatch(setUserProfile(response.data));
+			});
+	}
 }

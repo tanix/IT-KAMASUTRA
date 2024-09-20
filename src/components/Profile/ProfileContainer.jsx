@@ -2,8 +2,7 @@ import React from 'react';
 import s from "./Profile.module.css";
 import Profile from './Profile';
 import { connect } from 'react-redux';
-import Axios from 'axios';
-import { setUserProfile } from '../../redux/profile-reduser'
+import { setUserProfile , getProfileThunkCreator} from '../../redux/profile-reduser'
 import {
 	useLocation,
 	useNavigate,
@@ -12,12 +11,12 @@ import {
 
 class ProfileContainer extends React.Component {
 	componentDidMount() {
-		//debugger;
-		let userId = this.props.router.params.userId
-		Axios.get(`https://social-network.samuraijs.com/api/1.0/profile/${userId}`)
-			.then(response => {
-				this.props.setUserProfile(response.data);
-			});
+		let userId = this.props.router.params.userId;
+		if(!userId) {
+			userId = 31666;
+		}
+		// Thunk must be updated. Dispatch is not called
+		getProfileThunkCreator(userId)(window.store.dispatch);
 	}
 
 	render() {
